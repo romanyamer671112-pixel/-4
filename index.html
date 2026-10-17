@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة المزرعة الشامل Smart Farm Pro</title>
+    <meta name="theme-color" content="#ffcc00">
+    <style>
+        :root {
+            --bg-black: #121212;
+            --card-black: #1e1e1e;
+            --accent-yellow: #ffcc00;
+            --text-white: #ffffff;
+            --text-gray: #aaaaaa;
+            --danger-red: #e63946;
+            --success-green: #2a9d8f;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-black);
+            color: var(--text-white);
+            margin: 0;
+            padding: 15px;
+        }
+
+        #authScreen {
+            max-width: 400px;
+            margin: 80px auto;
+            background-color: var(--card-black);
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid var(--accent-yellow);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        #authScreen h2 {
+            color: var(--accent-yellow);
+            margin-bottom: 20px;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background-color: #2a2a2a;
+            color: var(--text-white);
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-yellow);
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .toggle-auth {
+            margin-top: 15px;
+            color: var(--text-gray);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .toggle-auth span {
+            color: var(--accent-yellow);
+            text-decoration: underline;
+        }
+
+        #appScreen {
+            display: none;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: var(--card-black);
+            border-bottom: 3px solid var(--accent-yellow);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: var(--accent-yellow);
+            margin: 0;
+            font-size: 1.6rem;
+        }
+
+        .logout-btn {
+            background-color: var(--danger-red);
+            color: #fff;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background-color: var(--card-black);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .card h3 {
+            color: var(--accent-yellow);
+            margin-top: 0;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+        }
+
+        .stat-box {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--text-white);
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        input[type="number"], input[type="text"], input[type="date"], select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background-color: #2a2a2a;
+            color: var(--text-white);
+            box-sizing: border-box;
+            margin-bottom: 5px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-plus {
+            background-color: var(--accent-yellow);
+            color: #000;
+        }
+
+        .btn-minus {
+            background-color: var(--danger-red);
+            color: #fff;
+        }
+
+        .btn-action {
+            background-color: var(--success-green);
+            color: #fff;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .btn-refresh {
+            background-color: #3a86ff;
+            color: #fff;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .btn-danger-outline {
+            background-color: transparent;
+            color: var(--danger-red);
+            border: 1px solid var(--danger-red);
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .feed-row {
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #333;
+        }
+
+        .worker-item {
+            background: #252525;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-right: 4px solid var(--accent-yellow);
+        }
+
+        .log-item {
+            background: #252525;
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            border-right: 3px solid var(--accent-yellow);
+            direction: rtl;
+        }
+
+        .val-badge {
+            color: var(--accent-yellow);
+            font-weight: bold;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .sub-section {
+            background: #252525;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border: 1px solid #333;
+        }
+
+        textarea {
+            width: 100%;
+            height: 90px;
+            background-color: #2a2a2a;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- شاشة تسجيل الدخول -->
+    <div id="authScreen">
+        <h2 id="authTitle">تسجيل دخول المزرعة</h2>
+        <input type="text" id="authEmail" class="auth-input" placeholder="رقم التليفون أو البريد الإلكتروني">
+        <input type="password" id="authPass" class="auth-input" placeholder="كلمة المرور">
+        <button class="auth-btn" id="authSubmitBtn" onclick="handleAuth()">دخول</button>
+        <div class="toggle-auth" onclick="toggleAuthMode()">
+            ليس لديك حساب؟ <span id="toggleText">انشاء حساب جديد</span>
+        </div>
+    </div>
+
+    <!-- لوحة المزرعة -->
+    <div id="appScreen">
+        <div class="header">
+            <div>
+                <h1>لوحة إدارة المزرعة الاحترافية</h1>
+                <small style="color: var(--text-gray);" id="loggedUserDisplay"></small>
+            </div>
+            <button class="logout-btn" onclick="logout()">تسجيل خروج</button>
+        </div>
+
+        <div class="grid-container">
+            <!-- قسم الفراخ المطور -->
+            <div class="card">
+                <h3>إدارة الفراخ والبورصة</h3>
+                <div class="stat-box" id="totalChickens">0</div>
+                <span class="val-badge">إجمالي قيمة المخزون الحالي: <span id="chickensTotalPrice">0</span> ج.م</span>
+                
+                <div class="control-group">
+                    <input type="number" id="chickenInput" placeholder="عدد الفراخ">
+                    <button class="btn btn-plus" onclick="updateCount('chickens', 1)">+</button>
+                    <button class="btn btn-minus" onclick="updateCount('chickens', -1)">-</button>
+                </div>
+
+                <div class="sub-section">
+                    <label style="color:var(--accent-yellow); font-weight:bold;">بورصة الفراخ اليومية:</label>
+                    <select id="chickenType">
+                        <option value="أبيض">فراخ بيضاء (تسمين)</option>
+                        <option value="ساسو">فراخ ساسو</option>
+                        <option value="بلدي">فراخ بلدي</option>
+                        <option value="أمهات">أمهات بيضاء</option>
+                        <option value="هجين">فراخ هجين</option>
+                        <option value="بياض">فراخ بياض</option>
+                    </select>
+                    <button class="btn btn-refresh" onclick="searchChickenBoursoGoogle()">ابحث عن سعر البورصة الحقيقي على جوجل 🔍</button>
+                    <div style="margin: 5px 0;">
+                        <label style="font-size:0.85rem; color:var(--accent-yellow);">سعر البورصة الحقيقي المعتمد اليوم:</label>
+                        <input type="number" id="customChickenBoursePrice" placeholder="اكتب السعر الحقيقي هنا" oninput="updateCustomChickenPrice()">
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <label>معاملات شراء الوارد (مصروفات):</label>
+                    <input type="number" id="chickenBuyAmount" placeholder="مبلغ شراء فراخ وارد">
+                    <button class="btn btn-action" style="background-color:var(--danger-red)" onclick="addTransaction('chickenBuy')">تسجيل مصروف وارد الفراخ</button>
+
+                    <label style="margin-top:8px; display:block;">معاملات المبيعات (وارد مالي):</label>
+                    <input type="number" id="chickenSellAmount" placeholder="مبلغ بيع فراخ">
+                    <button class="btn btn-action" onclick="addTransaction('chickenSell')">تسجيل إيراد مبيعات الفراخ</button>
+                </div>
+            </div>
+
+            <!-- قسم البيض والكراتين المطور -->
+            <div class="card">
+                <h3>إدارة البيض والكراتين والبورصة</h3>
+                <div>
+                    <label>إجمالي البيض (عدد): <strong id="totalEggs">0</strong> | الكراتين: <strong id="totalBoxes">0</strong></label>
+                    <span class="val-badge">قيمة مخزون البيض: <span id="eggsTotalPrice">0</span> ج.م</span>
+                    <div class="control-group">
+                        <input type="number" id="eggInput" placeholder="عدد البيض">
+                        <button class="btn btn-plus" onclick="updateCount('eggs', 1)">+</button>
+                        <button class="btn btn-minus" onclick="updateCount('eggs', -1)">-</button>
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <label style="color:var(--accent-yellow); font-weight:bold;">بورصة البيض اليومية:</label>
+                    <select id="eggType">
+                        <option value="أبيض">طبق بيض أبيض</option>
+                        <option value="أحمر">طبق بيض أحمر</option>
+                        <option value="بلدي">طبق بيض بلدي</option>
+                    </select>
+                    <button class="btn btn-refresh" onclick="searchEggBoursoGoogle()">ابحث عن سعر البيض الحقيقي على جوجل 🔍</button>
+                    <div style="margin: 5px 0;">
+                        <label style="font-size:0.85rem; color:var(--accent-yellow);">سعر كرتونة البيض الحقيقي المعتمد اليوم:</label>
+                        <input type="number" id="customEggBoursePrice" placeholder="اكتب سعر الكرتونة هنا" oninput="updateCustomEggPrice()">
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <label>مصروفات وشراء كراتين/مستلزمات بيض:</label>
+                    <input type="number" id="eggExpenseAmount" placeholder="المبلغ">
+                    <button class="btn btn-action" style="background-color:var(--danger-red)" onclick="addTransaction('eggExpense')">تسجيل مصروف البيض</button>
+
+                    <label style="margin-top:8px; display:block;">مبيعات البيض والكراتين (وارد مالي):</label>
+                    <input type="number" id="eggSellAmount" placeholder="مبلغ بيع البيض">
+                    <button class="btn btn-action" onclick="addTransaction('eggSell')">تسجيل إيراد مبيعات البيض</button>
+                </div>
+            </div>
+
+            <!-- قسم العلف -->
+            <div class="card">
+                <h3>أرصدة وتصنيع العلف</h3>
+                <span class="val-badge" style="margin-bottom:8px;">قيمة العلف المخزون: <span id="feedTotalPrice">0</span> ج.م</span>
+                <div id="feedContainer"></div>
+
+                <div class="sub-section">
+                    <label style="color:var(--accent-yellow); font-weight:bold;">تصنيع العلف وخامات الخلط:</label>
+                    <select id="feedRawMaterial">
+                        <option value="ذرة">ذرة صفراء</option>
+                        <option value="صويا">كسب صويا</option>
+                        <option value="مركزات">مركزات علف</option>
+                        <option value="ردة">ردة ناعمة</option>
+                        <option value="دش وخلط">دش وخلط</option>
+                        <option value="بودرة">بودرة بلاط / كلسيوم</option>
+                        <option value="إضافات علف">إضافات وأملاح</option>
+                        <option value="أدوية">أدوية ومحصنات</option>
+                    </select>
+                    <input type="number" id="rawMaterialKg" placeholder="الكمية بالكيلوجرام">
+                    <input type="number" id="rawMaterialCost" placeholder="سعر الشراء (مصروفات)">
+                    <button class="btn btn-action" style="background-color:var(--danger-red)" onclick="addTransaction('buyRawMaterial')">تسجيل شراء خامات علف</button>
+
+                    <hr style="border-color:#444; margin:10px 0;">
+                    <input type="number" id="feedMfgCost" placeholder="تكلفة تصنيع/كبس العلف">
+                    <button class="btn btn-action" style="background-color:var(--danger-red)" onclick="addTransaction('mfgCost')">تسجيل مصروفات التصنيع</button>
+
+                    <input type="number" id="feedSellAmount" placeholder="سعر بيع علف مصنّع" style="margin-top:8px;">
+                    <button class="btn btn-action" onclick="addTransaction('feedSell')">تسجيل مبيعات العلف المصنع</button>
+                </div>
+            </div>
+
+            <!-- قسم العمال والرواتب -->
+            <div class="card">
+                <h3>إدارة العمال والرواتب</h3>
+                <div>
+                    <input type="text" id="workerName" placeholder="اسم العامل">
+                    <input type="number" id="workerSalary" placeholder="المرتب الأساسي الشهري">
+                    <label style="font-size: 0.85rem; color: var(--text-gray); margin-top: 5px; display: block;">تاريخ بدء دورة الراتب:</label>
+                    <input type="date" id="workerStartDate">
+                    <button class="btn btn-action" onclick="addWorker()">إضافة عامل جديد</button>
+                </div>
+                <div id="workersList" style="max-height: 200px; overflow-y: auto; margin-top: 10px;"></div>
+            </div>
+
+            <!-- قسم المالية والملخص الشامل -->
+            <div class="card">
+                <h3>الملخص المالي العام للمزرعة</h3>
+                <div style="background-color: #252525; padding: 10px; border-radius: 6px; margin-bottom: 10px; border-right: 4px solid var(--accent-yellow);">
+                    <div style="font-weight: bold; color: var(--accent-yellow);">إجمالي الوارد / المبيعات: <span id="monthlyIncome">0</span> ج.م</div>
+                </div>
+                <div style="background-color: #252525; padding: 10px; border-radius: 6px; margin-bottom: 10px; border-right: 4px solid var(--danger-red);">
+                    <div style="font-weight: bold; color: var(--danger-red);">إجمالي المصروفات والمشتريات: <span id="monthlyExpense">0</span> ج.م</div>
+                    <div style="font-size:0.8rem; color:var(--text-gray); margin-top:4px;">منها رواتب عمال: <span id="totalSalaries">0</span> ج.م</div>
+                </div>
+                <hr style="border-color: #333; margin: 10px 0;">
+                <div style="font-weight: bold; font-size: 1.3rem;">الصافي الشهري النهائي: <span id="netProfit" style="color:var(--success-green)">0</span> ج.م</div>
+            </div>
+
+            <!-- سجل المعاملات بالوقت والتاريخ -->
+            <div class="card">
+                <h3>سجل العمليات الشامل بالوقت والتاريخ</h3>
+                <div id="transactionLog" style="max-height: 200px; overflow-y: auto;"></div>
+                <button class="btn-danger-outline" onclick="clearLogs()">مسح سجل العمليات فقط</button>
+            </div>
+
+            <!-- الملاحظات والتصفية -->
+            <div class="card">
+                <h3>ملاحظات دائمة وتصفية الدورة</h3>
+                <textarea id="notes" placeholder="اكتب ملاحظات المزرعة هنا..." oninput="saveAndCalculate()"></textarea>
+                <button class="btn-danger-outline" style="background-color: var(--danger-red); color:#fff; margin-top: 10px;" onclick="resetFarmData()">تصفية المزرعة والبدء من جديد</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isRegisterMode = false;
+        let currentUser = localStorage.getItem('smart_farm_current_user');
+
+        function getEmptyFarmData() {
+            return {
+                chickens: 0,
+                eggs: 0,
+                boxes: 0,
+                totalIncome: 0,
+                totalExpense: 0,
+                otherExpenses: 0,
+                notes: "",
+                feeds: [
+                    { name: "علف بادي", amount: 0 },
+                    { name: "علف نامي", amount: 0 },
+                    { name: "علف ناهي", amount: 0 },
+                    { name: "علف بياض 1", amount: 0 },
+                    { name: "علف بياض 2", amount: 0 }
+                ],
+                workers: [],
+                logs: []
+            };
+        }
+
+        let farmData = getEmptyFarmData();
+
+        function checkAuth() {
+            if (currentUser) {
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('appScreen').style.display = 'block';
+                document.getElementById('loggedUserDisplay').innerText = `المستخدم: ${currentUser}`;
+                loadUserData();
+            } else {
+                document.getElementById('authScreen').style.display = 'block';
+                document.getElementById('appScreen').style.display = 'none';
+            }
+        }
+
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('authTitle').innerText = isRegisterMode ? "إنشاء حساب مزرعة جديد" : "تسجيل دخول المزرعة";
+            document.getElementById('authSubmitBtn').innerText = isRegisterMode ? "تسجيل وحفظ" : "دخول";
+            document.querySelector('.toggle-auth').innerHTML = isRegisterMode ? 
+                `لديك حساب بالفعل؟ <span onclick="toggleAuthMode()">تسجيل دخول</span>` : 
+                `ليس لديك حساب؟ <span onclick="toggleAuthMode()">انشاء حساب جديد</span>`;
+        }
+
+        function handleAuth() {
+            let identifier = document.getElementById('authEmail').value.trim();
+            let pass = document.getElementById('authPass').value.trim();
+
+            if (!identifier || !pass) { alert("أدخل البيانات كاملة"); return; }
+            let usersDB = JSON.parse(localStorage.getItem('smart_farm_users_db')) || {};
+
+            if (isRegisterMode) {
+                if (usersDB[identifier]) { alert("الحساب موجود بالفعل!"); return; }
+                usersDB[identifier] = { password: pass, data: getEmptyFarmData() };
+                localStorage.setItem('smart_farm_users_db', JSON.stringify(usersDB));
+                alert("تم إنشاء الحساب بنجاح!");
+                toggleAuthMode();
+            } else {
+                if (!usersDB[identifier] || usersDB[identifier].password !== pass) {
+                    alert("خطأ في البيانات أو كلمة المرور!");
+                    return;
+                }
+                localStorage.setItem('smart_farm_current_user', identifier);
+                currentUser = identifier;
+                checkAuth();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('smart_farm_current_user');
+            currentUser = null;
+            checkAuth();
+        }
+
+        function loadUserData() {
+            let usersDB = JSON.parse(localStorage.getItem('smart_farm_users_db')) || {};
+            farmData = usersDB[currentUser] ? usersDB[currentUser].data : getEmptyFarmData();
+            loadDataToUI();
+        }
+
+        function saveData() {
+            if (!currentUser) return;
+            let usersDB = JSON.parse(localStorage.getItem('smart_farm_users_db')) || {};
+            farmData.notes = document.getElementById('notes').value || "";
+
+            if (usersDB[currentUser]) {
+                usersDB[currentUser].data = farmData;
+                localStorage.setItem('smart_farm_users_db', JSON.stringify(usersDB));
+            }
+        }
+
+        function loadDataToUI() {
+            document.getElementById('totalChickens').innerText = farmData.chickens || 0;
+            document.getElementById('totalEggs').innerText = farmData.eggs || 0;
+            document.getElementById('totalBoxes').innerText = farmData.boxes || 0;
+            document.getElementById('notes').value = farmData.notes || '';
+            document.getElementById('workerStartDate').valueAsDate = new Date();
+
+            renderFeeds();
+            renderWorkers();
+            renderLogs();
+            calculateFinancials();
+            updateCustomChickenPrice();
+            updateCustomEggPrice();
+        }
+
+        function searchChickenBoursoGoogle() {
+            let type = document.getElementById('chickenType').value;
+            let query = `سعر بورصة الفراخ ال${type} اليوم في مصر`;
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+        }
+
+        function searchEggBoursoGoogle() {
+            let type = document.getElementById('eggType').value;
+            let query = `سعر بورصة البيض ال${type} اليوم في مصر`;
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+        }
+
+        function updateCustomChickenPrice() {
+            let customP = parseFloat(document.getElementById('customChickenBoursePrice').value) || 0;
+            document.getElementById('chickensTotalPrice').innerText = (farmData.chickens * customP).toFixed(2);
+            saveData();
+        }
+
+        function updateCustomEggPrice() {
+            let customP = parseFloat(document.getElementById('customEggBoursePrice').value) || 0;
+            document.getElementById('eggsTotalPrice').innerText = (farmData.eggs * (customP / 30)).toFixed(2);
+            saveData();
+        }
+
+        function addTransaction(type) {
+            let now = new Date();
+            let dateStr = `${now.toLocaleDateString('en-US')} ${now.toLocaleTimeString('en-US')}`;
+
+            if(type === 'chickenBuy') {
+                let val = parseFloat(document.getElementById('chickenBuyAmount').value) || 0;
+                if(val <= 0) return;
+                farmData.totalExpense += val;
+                addLog(`[${dateStr}] - مصروف شراء وارد فراخ: ${val} ج.م`);
+                document.getElementById('chickenBuyAmount').value = '';
+            } else if(type === 'chickenSell') {
+                let val = parseFloat(document.getElementById('chickenSellAmount').value) || 0;
+                if(val <= 0) return;
+                farmData.totalIncome += val;
+                addLog(`[${dateStr}] - إيراد مبيعات فراخ: ${val} ج.م`);
+                document.getElementById('chickenSellAmount').value = '';
+            } else if(type === 'eggExpense') {
+                let val = parseFloat(document.getElementById('eggExpenseAmount').value) || 0;
+                if(val <= 0) return;
+                farmData.totalExpense += val;
+                addLog(`[${dateStr}] - مصروف مستلزمات بيض: ${val} ج.م`);
+                document.getElementById('eggExpenseAmount').value = '';
+            } else if(type === 'eggSell') {
+                let val = parseFloat(document.getElementById('eggSellAmount').value) || 0;
+                if(val <= 0) return;
+                farmData.totalIncome += val;
+                addLog(`[${dateStr}] - إيراد مبيعات بيض: ${val} ج.م`);
+                document.getElementById('eggSellAmount').value = '';
+            } else if(type === 'buyRawMaterial') {
+                let mat = document.getElementById('feedRawMaterial').value;
+                let kg = parseFloat(document.getElementById('rawMaterialKg').value) || 0;
+                let cost = parseFloat(document.getElementById('rawMaterialCost').value) || 0;
+                if(cost <= 0) return;
+                farmData.totalExpense += cost;
+                addLog(`[${dateStr}] - شراء خامة علف (${mat}) كمية ${kg} كجم بمبلغ: ${cost} ج.م`);
+                document.getElementById('rawMaterialKg').value = '';
+                document.getElementById('rawMaterialCost').value = '';
+            } else if(type === 'mfgCost') {
+                let val = parseFloat(document.getElementById('feedMfgCost').value) || 0;
+                if(val <= 0) return;
+                farmData.totalExpense += val;
+                addLog(`[${dateStr}] - مصروفات تصنيع وكبس علف: ${val} ج.م`);
+                document.getElementById('feedMfgCost').value = '';
+            } else if(type === 'feedSell') {
+                let val = parseFloat(document.getElementById('feedSellAmount').value) || 0;
+                if(val <= 0) return;
+                farmData.totalIncome += val;
+                addLog(`[${dateStr}] - إيراد مبيعات علف مصنّع: ${val} ج.م`);
+                document.getElementById('feedSellAmount').value = '';
+            }
+
+            saveAndCalculate();
+        }
+
+        function addLog(text) {
+            farmData.logs.unshift(text);
+            renderLogs();
+        }
+
+        function renderLogs() {
+            const container = document.getElementById('transactionLog');
+            if(!farmData.logs || farmData.logs.length === 0) {
+                container.innerHTML = '<div style="color:var(--text-gray); font-size:0.85rem;">لا توجد معاملات مسجلة حتى الآن.</div>';
+                return;
+            }
+            container.innerHTML = '';
+            farmData.logs.forEach(log => {
+                container.innerHTML += `<div class="log-item">${log}</div>`;
+            });
+        }
+
+        function clearLogs() {
+            if (confirm("هل أنت متأكد من مسح سجل العمليات فقط؟")) {
+                farmData.logs = [];
+                renderLogs();
+                saveData();
+            }
+        }
+
+        function resetFarmData() {
+            if (confirm("تنبيه هام: هل تريد تصفية كافة بيانات المزرعة للبدء من جديد؟")) {
+                farmData = getEmptyFarmData();
+                saveData();
+                loadDataToUI();
+                alert("تم تصفية المزرعة بنجاح.");
+            }
+        }
+
+        function renderFeeds() {
+            const container = document.getElementById('feedContainer');
+            container.innerHTML = '';
+            farmData.feeds.forEach((feed, index) => {
+                container.innerHTML += `
+                    <div class="feed-row">
+                        <input type="text" value="${feed.name}" onchange="farmData.feeds[${index}].name=this.value; saveData();" style="margin-bottom:5px;">
+                        <div>الرصيد: <strong>${feed.amount}</strong> كجم</div>
+                        <div class="control-group">
+                            <input type="number" id="feedInput_${index}" placeholder="الكمية">
+                            <button class="btn btn-plus" onclick="updateFeed(${index}, 1)">+</button>
+                            <button class="btn btn-minus" onclick="updateFeed(${index}, -1)">-</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function updateCount(type, multiplier) {
+            let inputId = type === 'chickens' ? 'chickenInput' : 'eggInput';
+            let input = document.getElementById(inputId);
+            let val = parseFloat(input.value) || 0;
+            if(val <= 0) return;
+
+            farmData[type] += val * multiplier;
+            if(farmData[type] < 0) farmData[type] = 0;
+
+            // تحديث العدد في الشاشة فوراً
+            if(type === 'chickens') {
+                document.getElementById('totalChickens').innerText = farmData.chickens;
+            } else if(type === 'eggs') {
+                document.getElementById('totalEggs').innerText = farmData.eggs;
+                farmData.boxes = Math.floor(farmData.eggs / 30);
+                document.getElementById('totalBoxes').innerText = farmData.boxes;
+            }
+            
+            let label = type === 'chickens' ? 'فراخ' : 'بيض';
+            let op = multiplier > 0 ? 'إضافة' : 'خصم';
+            let now = new Date();
+            addLog(`[${now.toLocaleDateString('en-US')} ${now.toLocaleTimeString('en-US')}] - ${op} ${val} من ${label}`);
+
+            input.value = '';
+            saveAndCalculate();
+        }
+
+        function updateFeed(index, multiplier) {
+            let input = document.getElementById(`feedInput_${index}`);
+            let val = parseFloat(input.value) || 0;
+            if(val <= 0) return;
+
+            farmData.feeds[index].amount += val * multiplier;
+            if(farmData.feeds[index].amount < 0) farmData.feeds[index].amount = 0;
+            
+            let op = multiplier > 0 ? 'إضافة' : 'خصم';
+            let now = new Date();
+            addLog(`[${now.toLocaleDateString('en-US')} ${now.toLocaleTimeString('en-US')}] - ${op} ${val} كجم من ${farmData.feeds[index].name}`);
+
+            renderFeeds();
+            saveAndCalculate();
+        }
+
+        function addWorker() {
+            let name = document.getElementById('workerName').value;
+            let salary = parseFloat(document.getElementById('workerSalary').value) || 0;
+            let startDate = document.getElementById('workerStartDate').value;
+
+            if(!name) { alert("اكتب اسم العامل"); return; }
+            farmData.workers.push({ name: name, baseSalary: salary, startDate: startDate, absenceDays: 0, overtimeDays: 0 });
+
+            let now = new Date();
+            addLog(`[${now.toLocaleDateString('en-US')} ${now.toLocaleTimeString('en-US')}] - إضافة العامل: ${name}`);
+            document.getElementById('workerName').value = '';
+            document.getElementById('workerSalary').value = '';
+            renderWorkers();
+            saveAndCalculate();
+        }
+
+        function updateWorkerStat(index, field, val) {
+            farmData.workers[index][field] += val;
+            if(farmData.workers[index][field] < 0) farmData.workers[index][field] = 0;
+            
+            let fieldLabel = field === 'absenceDays' ? 'غياب' : 'أيام إضافية';
+            let op = val > 0 ? 'إضافة' : 'خصم';
+            let now = new Date();
+            addLog(`[${now.toLocaleDateString('en-US')} ${now.toLocaleTimeString('en-US')}] - ${op} ${fieldLabel} للعامل ${farmData.workers[index].name}`);
+
+            renderWorkers();
+            saveAndCalculate();
+        }
+
+        function resetWorkerCycle(index) {
+            let newDateInput = prompt("تاريخ بدء الدورة الجديدة (YYYY-MM-DD):", new Date().toISOString().slice(0, 10));
+            if (newDateInput) {
+                farmData.workers[index].absenceDays = 0;
+                farmData.workers[index].overtimeDays = 0;
+                farmData.workers[index].startDate = newDateInput;
+                let now = new Date();
+                addLog(`[${now.toLocaleDateString('en-US')} ${now.toLocaleTimeString('en-US')}] - تجديد شهر للعامل ${farmData.workers[index].name}`);
+                renderWorkers();
+                saveAndCalculate();
+            }
+        }
+
+        function renderWorkers() {
+            const container = document.getElementById('workersList');
+            container.innerHTML = '';
+            farmData.workers.forEach((worker, index) => {
+                let dailyRate = worker.baseSalary / 30;
+                let netSalary = worker.baseSalary - (worker.absenceDays * dailyRate) + (worker.overtimeDays * dailyRate);
+                if(netSalary < 0) netSalary = 0;
+
+                container.innerHTML += `
+                    <div class="worker-item">
+                        <strong>${worker.name}</strong> (الأساسي: ${worker.baseSalary} ج.م)
+                        <div style="font-size:0.8rem; color:var(--accent-yellow);">تجديد من: ${worker.startDate || 'غير محدد'}</div>
+                        <div style="font-size:0.85rem; color:var(--text-gray);">غياب: ${worker.absenceDays} يوم | إضافي: ${worker.overtimeDays} يوم</div>
+                        <div style="font-weight:bold; color:var(--accent-yellow);">الصافي المستحق: ${netSalary.toFixed(2)} ج.م</div>
+                        <div class="control-group" style="margin-top:4px;">
+                            <button class="btn btn-minus" style="font-size:0.7rem; padding:3px;" onclick="updateWorkerStat(${index}, 'absenceDays', 1)">+ غياب</button>
+                            <button class="btn btn-plus" style="font-size:0.7rem; padding:3px;" onclick="updateWorkerStat(${index}, 'absenceDays', -1)">- غياب</button>
+                            <button class="btn btn-plus" style="font-size:0.7rem; padding:3px;" onclick="updateWorkerStat(${index}, 'overtimeDays', 1)">+ إضافي</button>
+                            <button class="btn btn-minus" style="font-size:0.7rem; padding:3px;" onclick="updateWorkerStat(${index}, 'overtimeDays', -1)">- إضافي</button>
+                        </div>
+                        <button class="btn-danger-outline" style="font-size:0.75rem; padding:3px; margin-top:4px;" onclick="resetWorkerCycle(${index})">تجديد وبدء شهر جديد</button>
+                    </div>
+                `;
+            });
+        }
+
+        function calculateFinancials() {
+            let totalSalaries = 0;
+            farmData.workers.forEach(worker => {
+                let dailyRate = worker.baseSalary / 30;
+                let net = worker.baseSalary - (worker.absenceDays * dailyRate) + (worker.overtimeDays * dailyRate);
+                if(net > 0) totalSalaries += net;
+            });
+
+            document.getElementById('totalSalaries').innerText = totalSalaries.toFixed(2);
+            document.getElementById('monthlyIncome').innerText = (farmData.totalIncome || 0).toFixed(2);
+            
+            let totalExp = (farmData.totalExpense || 0) + totalSalaries;
+            document.getElementById('monthlyExpense').innerText = totalExp.toFixed(2);
+
+            let netProfit = farmData.totalIncome - totalExp;
+            document.getElementById('netProfit').innerText = netProfit.toFixed(2);
+        }
+
+        function saveAndCalculate() {
+            saveData();
+            calculateFinancials();
+            updateCustomChickenPrice();
+            updateCustomEggPrice();
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>
